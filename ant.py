@@ -3,7 +3,7 @@ import math
 
 
 class Ant:
-    def __init__(self, id, x=400, y=400, following=None, in_trail=None, player_controlled=False):
+    def __init__(self, id, x=150, y=150, following=None, in_trail=None, player_controlled=False):
         """Initialize the ant's position."""
         self.id = id
         self.x = x
@@ -15,6 +15,8 @@ class Ant:
         self.player_controlled = player_controlled
         self.colour = (255, 0, 0)
         self.alive = True
+
+        self.isCarrying = False
 
     def move_forward(self):
         """Move the ant forward based on its heading."""
@@ -37,8 +39,13 @@ class Ant:
     def draw(self, screen):
         """Draw the ant's current position using pygame."""
         # ant_color = (255, 0, 0)  # Red color for the ant
+
+        if self.isCarrying:
+            ant_color = (0, 255, 0)
+        else:
+            ant_color = (255, 0, 0)  # Red color for the ant
         rotated_surface = pygame.Surface((20, 10), pygame.SRCALPHA)
-        pygame.draw.ellipse(rotated_surface, self.colour, (0, 0, 20, 10))
+        pygame.draw.ellipse(rotated_surface, ant_color, (0, 0, 20, 10))
         rotated_surface = pygame.transform.rotate(
             rotated_surface, -self.heading)
         rect = rotated_surface.get_rect(center=(self.x, self.y))
@@ -78,3 +85,4 @@ class Ant:
 
         self.following = None
         self.alive = False
+        return math.sqrt((self.following.x - self.x) ** 2 + (self.following.y - self.y) ** 2)

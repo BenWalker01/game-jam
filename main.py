@@ -15,8 +15,13 @@ WIDTH, HEIGHT = 800, 600
 # Game variables
 BASEX = 0
 BASEY = 0
+# fonts
+font = pygame.font.Font('freesansbold.ttf', 20)
+# Game variables
+BASEX = 150
+BASEY = 150
+BASERAD = 45
 LEAFMULTIPLIER = 0.05
-
 
 # Colors
 BLACK = (0, 0, 0)
@@ -37,20 +42,19 @@ clock = pygame.time.Clock()
 
 def spawnLeaves(leafPiles):
     """ Return leafPiles"""
-    x = random.randint(10, WIDTH)
-    y = random.randint(10, HEIGHT)
+    x = random.randint(50, WIDTH-50)
+    y = random.randint(50, HEIGHT-30)
 
     distFromBase = math.sqrt((abs(BASEX - x)**2) + (abs(BASEY-y)**2))
     numLeaves = int(distFromBase * LEAFMULTIPLIER)
 
-    leafPiles += [{"x": x, "y": y, "leaves": numLeaves}]
+    leafPiles += [pygame.Rect(x, y, numLeaves, numLeaves)]
 
     return leafPiles
 
 
 def drawLeaves(leafPiles):
 
-    font = pygame.font.Font('freesansbold.ttf', 20)
     for pile in leafPiles:
 
         pygame.draw.rect(
@@ -59,18 +63,39 @@ def drawLeaves(leafPiles):
         screen.blit(numText, (pile["x"], pile["y"]))
 
 
-def pickUpLeaves():
-    # Get collision
-    # Sub number of ants from number of leaves
-    # update number of leaves carrying
-    pass
+def pickUpLeaves(ants, leafPiles):
+    toPop = []
+    for ant in ants:
+        if not ant.isCarrying:
+            if pygame.Rect.collidelist(pygame.Rect(ant.x, ant.y, 20, 30), leafPiles):
+                for leaf in leafPiles:
+                    if pygame.Rect.colliderect(pygame.Rect(ant.x, ant.y, 20, 30), leaf):
+                        leaf.width -= 1
+                        leaf.height -= 1
+
+                        if leaf.width < 1:
+                            toPop += [leaf]
+
+                        ant.isCarrying = True
+                        break
+
+    for leaf in toPop:
+        leafPiles.remove(leaf)
+        leafPiles = spawnLeaves(leafPiles)
 
 
-def depositLeaves():
+def depositLeaves(ants, score):
+    """returns score"""
     # on collision with base
     # number of leaves carrying = 0
     # score += number of leaves
-    pass
+
+    for ant in ants:
+        if ant.isCarrying:
+            if math.sqrt((abs(ant.x - BASEX) ** 2)+(abs(ant.y - BASEY)**2)) < BASERAD:
+                ant.isCarrying = False
+                score += 1
+    return score
 
 
 # Main game loop
@@ -79,15 +104,15 @@ def main():
 
     leafPiles = []
     # Spawn initial leaves
+    score = 0
     for i in range(10):
-        leafPiles += spawnLeaves(leafPiles)
-
-    alice = Mob("Spider", (200, 200), 100, 0.5)
+        leafPiles = spawnLeaves(leafPiles)
 
     running = True
 
     bob = Ant("Bob", player_controlled=True)
     ants = [bob]
+
     for i in range(NUM_ANTS):
         ants.append(Ant(i, following=ants[i]))
 
@@ -111,16 +136,28 @@ def main():
         if keys[pygame.K_e]:
             bob.turn_right()
 
+        pygame.draw.circle(screen, BROWN, (BASEX, BASEY), BASERAD)
+
+        scoreText = font.render(str(score), True, WHITE, BROWN)
+        screen.blit(scoreText, (BASEX-5, BASEY-10))
         drawLeaves(leafPiles)
 
         bob.draw(screen)
         for ant in ants[1:]:
             ant.look_at_lead()
+            print(ant.distance_to_lead())
             if ant.distance_to_lead() > 30:
                 ant.move_forward()
-            if ant.alive:
-                ant.draw(screen)
+            ant.draw(screen)
             # Update display
+
+        pickUpLeaves(ants, leafPiles)
+        prevScore = score
+        score = depositLeaves(ants, score)
+
+        for i in range((score // 5) - (prevScore//5)):
+            newAnt = Ant(following=ants[-1])
+            ants += [newAnt]
 
         # Update display
         pygame.display.flip()
