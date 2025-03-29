@@ -11,6 +11,7 @@ class Ant:
         self.speed = 1
         self.following: Ant = following
         self.player_controlled = player_controlled
+        self.colour = (255, 0, 0)
 
     def move_forward(self):
         """Move the ant forward based on its heading."""
@@ -32,9 +33,9 @@ class Ant:
 
     def draw(self, screen):
         """Draw the ant's current position using pygame."""
-        ant_color = (255, 0, 0)  # Red color for the ant
+        # ant_color = (255, 0, 0)  # Red color for the ant
         rotated_surface = pygame.Surface((20, 10), pygame.SRCALPHA)
-        pygame.draw.ellipse(rotated_surface, ant_color, (0, 0, 20, 10))
+        pygame.draw.ellipse(rotated_surface, self.colour, (0, 0, 20, 10))
         rotated_surface = pygame.transform.rotate(
             rotated_surface, -self.heading)
         rect = rotated_surface.get_rect(center=(self.x, self.y))

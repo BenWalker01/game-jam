@@ -119,9 +119,14 @@ def main():
             # Update display
 
         alice.draw(screen)
-        alice.move_randomly()
+        if any(alice.is_ant_inside(ant.x, ant.y) for ant in ants):
+            alice.find_target(ants)
+            alice.track_target()
+
+        else:
+            alice.target = None
+            alice.move_randomly()
         alice.debug(screen)
-        print(alice.target)
 
         # Update display
         pygame.display.flip()
