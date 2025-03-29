@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-
+from ant import Ant
 # Initialize Pygame
 pygame.init()
 
@@ -13,54 +13,50 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CIRCLE_COLOR = (0, 255, 0)
 
-# Circle properties
-CIRCLE_RADIUS = 20
-CIRCLE_SPEED = 5
-
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game Jam")  # TODO : Change lol
 
+
 # Clock for controlling frame rate
 clock = pygame.time.Clock()
-
-# List to store circles
-circles = []
-
-
-def create_circle():
-    x = random.randint(CIRCLE_RADIUS, WIDTH - CIRCLE_RADIUS)
-    y = -CIRCLE_RADIUS  # Start above the screen
-    return {"x": x, "y": y}
-
-# Main game loop
 
 
 def main():
     running = True
 
+    bob = Ant()
+
     while running:
+        # Clear screen
+        screen.fill(BLACK)
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        keys = pygame.key.get_pressed()
+        # if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        #     bob.move_left()
+        # if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        #     bob.move_right()
+        # if keys[pygame.K_UP] or keys[pygame.K_w]:
+        #     bob.move_up()
+        # if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        #     bob.move_down()
 
-        # Clear screen
-        screen.fill(BLACK)
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            bob.move_forward()
 
-        # Add new circles randomly
-        if random.random() < 0.02:  # Adjust probability for more/less circles
-            circles.append(create_circle())
+        if keys[pygame.K_q]:
+            bob.turn_left()
+        if keys[pygame.K_e]:
+            bob.turn_right()
 
-        # Update and draw circles
-        for circle in circles:
-            circle["y"] += CIRCLE_SPEED
-            pygame.draw.circle(screen, CIRCLE_COLOR,
-                               (circle["x"], circle["y"]), CIRCLE_RADIUS)
+        # Draw the Ant
+        bob.draw(screen)
 
-        # Remove circles that move off the screen
-        circles[:] = [circle for circle in circles if circle["y"] -
-                      CIRCLE_RADIUS < HEIGHT]
+        # Create and draw other ants that follow Bob
+        num_ants = 5
 
         # Update display
         pygame.display.flip()
