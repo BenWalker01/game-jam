@@ -2,6 +2,7 @@ import pygame
 import random
 import sys
 from ant import Ant
+from mob import Mob
 import math
 
 # Initialize Pygame
@@ -77,9 +78,11 @@ def depositLeaves():
 def main():
 
     leafPiles = []
-    # Spawn intital leaves
+    # Spawn initial leaves
     for i in range(10):
         leafPiles += spawnLeaves(leafPiles)
+
+    alice = Mob("Spider", (200, 200), 100, 0.5)
 
     running = True
 
@@ -110,11 +113,15 @@ def main():
         bob.draw(screen)
         for ant in ants[1:]:
             ant.look_at_lead()
-            print(ant.distance_to_lead())
             if ant.distance_to_lead() > 30:
                 ant.move_forward()
             ant.draw(screen)
             # Update display
+
+        alice.draw(screen)
+        alice.move_randomly()
+        alice.debug(screen)
+        print(alice.target)
 
         # Update display
         pygame.display.flip()
