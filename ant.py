@@ -85,4 +85,3 @@ class Ant:
 
         self.following = None
         self.alive = False
-        return math.sqrt((self.following.x - self.x) ** 2 + (self.following.y - self.y) ** 2)
