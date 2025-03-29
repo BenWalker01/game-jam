@@ -122,10 +122,6 @@ def main():
                 ant.draw(screen)
             # Update display
 
-        alice.update(ants)
-        alice.debug(screen)
-        alice.draw(screen)
-
         # Update display
         pygame.display.flip()
 
