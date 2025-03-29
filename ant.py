@@ -3,13 +3,14 @@ import math
 
 
 class Ant:
-    def __init__(self, x=400, y=400):
+    def __init__(self, x=400, y=400, player_controlled=False):
         """Initialize the ant's position."""
         self.x = x
         self.y = y
         self.heading = 0
         self.speed = 1
         self.next_ant: Ant = None
+        self.player_controlled = player_controlled
 
     def move_forward(self):
         """Move the ant forward based on its heading."""
@@ -52,10 +53,11 @@ class Ant:
     def update_follower(self):
         """Update the position of the next ant in the sequence"""
         if self.next_ant:
-            distance_x = self.x - self.next_ant.x
-            distance_y = self.y - self.next_ant.y
-            distance = (distance_x**2 + distance_y**2)**0.5
+            dx = self.next_ant.x - self.x
+            dy = self.next_ant.y - self.y
+            angle_to_next = math.degrees(math.atan2(-dy, dx))
+            self.next_ant.heading = 180 - angle_to_next
 
-            if distance > 20:  # Maintain a minimum distance of 20 units
-                self.next_ant.x += distance_x * 0.1
-                self.next_ant.y += distance_y * 0.1
+    def distance_to(self, ant2):
+        """Calculate the distance between two ants."""
+        return math.sqrt((ant2.x - self.x) ** 2 + (ant2.y - self.y) ** 2)
