@@ -85,3 +85,4 @@ class Ant:
 
         self.following = None
         self.alive = False
+

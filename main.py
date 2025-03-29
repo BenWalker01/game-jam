@@ -129,6 +129,7 @@ def main():
         radius = random.randint(30, 100)
         mobs.append(Mob(i, (x, y), radius, speed=speed))
 
+
     while running:
         # Clear screen
         screen.fill(GREEN)
