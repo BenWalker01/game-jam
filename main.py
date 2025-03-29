@@ -12,6 +12,7 @@ WIDTH, HEIGHT = 800, 600
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CIRCLE_COLOR = (0, 255, 0)
+NUM_ANTS = 5
 
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -25,9 +26,10 @@ clock = pygame.time.Clock()
 def main():
     running = True
 
-    bob = Ant()
-    alice = Ant(500, 400)
-    bob.next_ant = alice
+    bob = Ant(player_controlled=True)
+    ants = [bob]
+    for i in range(NUM_ANTS):
+        ants.append(Ant(following=ants[i]))
 
     while running:
         # Clear screen
@@ -55,14 +57,20 @@ def main():
             bob.turn_right()
 
         # Draw the Ant
-        bob.draw(screen)
-        alice.draw(screen)
-        if bob.distance_to(alice) > 30:
-            alice.move_forward()
-        # Create and draw other ants that follow Bob
-        num_ants = 5
+        # bob.draw(screen)
+        # alice.look_at_lead()
+        # if bob.distance_to(alice) > 30:
+        #     alice.move_forward()
+        # alice.draw(screen)
 
-        # Update display
+        bob.draw(screen)
+        for ant in ants[1:]:
+            ant.look_at_lead()
+            print(ant.distance_to_lead())
+            if ant.distance_to_lead() > 30:
+                ant.move_forward()
+            ant.draw(screen)
+            # Update display
         pygame.display.flip()
 
         # Cap the frame rate

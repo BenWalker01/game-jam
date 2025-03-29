@@ -3,13 +3,13 @@ import math
 
 
 class Ant:
-    def __init__(self, x=400, y=400, player_controlled=False):
+    def __init__(self, x=400, y=400, following=None, player_controlled=False):
         """Initialize the ant's position."""
         self.x = x
         self.y = y
         self.heading = 0
         self.speed = 1
-        self.next_ant: Ant = None
+        self.following: Ant = following
         self.player_controlled = player_controlled
 
     def move_forward(self):
@@ -48,16 +48,14 @@ class Ant:
         pygame.draw.line(screen, (0, 255, 0),
                          (self.x, self.y), (end_x, end_y), 2)
 
-        self.update_follower()
-
-    def update_follower(self):
+    def look_at_lead(self):
         """Update the position of the next ant in the sequence"""
-        if self.next_ant:
-            dx = self.next_ant.x - self.x
-            dy = self.next_ant.y - self.y
+        if self.following:
+            dx = self.following.x - self.x
+            dy = self.following.y - self.y
             angle_to_next = math.degrees(math.atan2(-dy, dx))
-            self.next_ant.heading = 180 - angle_to_next
+            self.heading = -angle_to_next
 
-    def distance_to(self, ant2):
+    def distance_to_lead(self):
         """Calculate the distance between two ants."""
-        return math.sqrt((ant2.x - self.x) ** 2 + (ant2.y - self.y) ** 2)
+        return math.sqrt((self.following.x - self.x) ** 2 + (self.following.y - self.y) ** 2)
