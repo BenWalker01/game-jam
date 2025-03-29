@@ -26,6 +26,8 @@ def main():
     running = True
 
     bob = Ant()
+    alice = Ant(500, 400)
+    bob.next_ant = alice
 
     while running:
         # Clear screen
@@ -54,7 +56,9 @@ def main():
 
         # Draw the Ant
         bob.draw(screen)
-
+        alice.draw(screen)
+        if bob.distance_to(alice) > 30:
+            alice.move_forward()
         # Create and draw other ants that follow Bob
         num_ants = 5
 
