@@ -2,16 +2,27 @@ import pygame
 import random
 import sys
 from ant import Ant
+import math
+
 # Initialize Pygame
 pygame.init()
 
 # Screen dimensions
 WIDTH, HEIGHT = 800, 600
 
+
+# Game variables
+BASEX = 0
+BASEY = 0
+LEAFMULTIPLIER = 0.05
+
+
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CIRCLE_COLOR = (0, 255, 0)
+GREEN = (55, 153, 35)
+BROWN = (77, 39, 39)
 NUM_ANTS = 5
 
 # Initialize screen
@@ -23,7 +34,53 @@ pygame.display.set_caption("Game Jam")  # TODO : Change lol
 clock = pygame.time.Clock()
 
 
+def spawnLeaves(leafPiles):
+    """ Return leafPiles"""
+    x = random.randint(10, WIDTH)
+    y = random.randint(10, HEIGHT)
+
+    distFromBase = math.sqrt((abs(BASEX - x)**2) + (abs(BASEY-y)**2))
+    numLeaves = int(distFromBase * LEAFMULTIPLIER)
+
+    leafPiles += [{"x": x, "y": y, "leaves": numLeaves}]
+
+    return leafPiles
+
+
+def drawLeaves(leafPiles):
+
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    for pile in leafPiles:
+
+        pygame.draw.rect(
+            screen, BROWN, (pile["x"], pile["y"], pile["leaves"], pile["leaves"]))
+        numText = font.render(str(pile["leaves"]), True, WHITE, BROWN)
+        screen.blit(numText, (pile["x"], pile["y"]))
+
+
+def pickUpLeaves():
+    # Get collision
+    # Sub number of ants from number of leaves
+    # update number of leaves carrying
+    pass
+
+
+def depositLeaves():
+    # on collision with base
+    # number of leaves carrying = 0
+    # score += number of leaves
+    pass
+
+
+# Main game loop
+
 def main():
+
+    leafPiles = []
+    # Spawn intital leaves
+    for i in range(10):
+        leafPiles += spawnLeaves(leafPiles)
+
     running = True
 
     bob = Ant(player_controlled=True)
@@ -33,20 +90,12 @@ def main():
 
     while running:
         # Clear screen
-        screen.fill(BLACK)
+        screen.fill(GREEN)
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
         keys = pygame.key.get_pressed()
-        # if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        #     bob.move_left()
-        # if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        #     bob.move_right()
-        # if keys[pygame.K_UP] or keys[pygame.K_w]:
-        #     bob.move_up()
-        # if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        #     bob.move_down()
 
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             bob.move_forward()
@@ -56,12 +105,7 @@ def main():
         if keys[pygame.K_e]:
             bob.turn_right()
 
-        # Draw the Ant
-        # bob.draw(screen)
-        # alice.look_at_lead()
-        # if bob.distance_to(alice) > 30:
-        #     alice.move_forward()
-        # alice.draw(screen)
+        drawLeaves(leafPiles)
 
         bob.draw(screen)
         for ant in ants[1:]:
@@ -71,6 +115,8 @@ def main():
                 ant.move_forward()
             ant.draw(screen)
             # Update display
+
+        # Update display
         pygame.display.flip()
 
         # Cap the frame rate
