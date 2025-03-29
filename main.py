@@ -56,11 +56,10 @@ def spawnLeaves(leafPiles):
 def drawLeaves(leafPiles):
 
     for pile in leafPiles:
-
         pygame.draw.rect(
-            screen, BROWN, (pile["x"], pile["y"], pile["leaves"], pile["leaves"]))
-        numText = font.render(str(pile["leaves"]), True, WHITE, BROWN)
-        screen.blit(numText, (pile["x"], pile["y"]))
+            screen, BROWN, (pile.x, pile.y, pile.width, pile.height))
+        numText = font.render(str(pile.height), True, WHITE, BROWN)
+        screen.blit(numText, (pile.x, pile.y))
 
 
 def pickUpLeaves(ants, leafPiles):
@@ -156,7 +155,8 @@ def main():
         score = depositLeaves(ants, score)
 
         for i in range((score // 5) - (prevScore//5)):
-            newAnt = Ant(following=ants[-1])
+            newAnt = Ant(len(ants)-1, following=ants[-1])
+            ants[-1].in_trail = newAnt
             ants += [newAnt]
 
         # Update display
