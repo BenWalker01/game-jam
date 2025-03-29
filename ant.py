@@ -3,15 +3,18 @@ import math
 
 
 class Ant:
-    def __init__(self, x=400, y=400, following=None, player_controlled=False):
+    def __init__(self, id, x=400, y=400, following=None, in_trail=None, player_controlled=False):
         """Initialize the ant's position."""
+        self.id = id
         self.x = x
         self.y = y
         self.heading = 0
         self.speed = 1
         self.following: Ant = following
+        self.in_trail: Ant = in_trail
         self.player_controlled = player_controlled
         self.colour = (255, 0, 0)
+        self.alive = True
 
     def move_forward(self):
         """Move the ant forward based on its heading."""
@@ -59,4 +62,19 @@ class Ant:
 
     def distance_to_lead(self):
         """Calculate the distance between two ants."""
-        return math.sqrt((self.following.x - self.x) ** 2 + (self.following.y - self.y) ** 2)
+        if self.following:
+            return math.sqrt((self.following.x - self.x) ** 2 + (self.following.y - self.y) ** 2)
+        return 0
+
+    def remove(self):
+        """Remove this ant from the chain."""
+        print(f"{self.id}, has died :(")
+
+        if self.following:
+            self.following.in_trail = self.in_trail
+
+        if self.in_trail:
+            self.in_trail.following = self.following
+
+        self.following = None
+        self.alive = False

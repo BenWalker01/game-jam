@@ -86,10 +86,13 @@ def main():
 
     running = True
 
-    bob = Ant(player_controlled=True)
+    bob = Ant("Bob", player_controlled=True)
     ants = [bob]
     for i in range(NUM_ANTS):
-        ants.append(Ant(following=ants[i]))
+        ants.append(Ant(i, following=ants[i]))
+
+    for i, ant in enumerate(ants[:-1]):
+        ant.in_trail = ants[i+1]
 
     while running:
         # Clear screen
@@ -115,18 +118,13 @@ def main():
             ant.look_at_lead()
             if ant.distance_to_lead() > 30:
                 ant.move_forward()
-            ant.draw(screen)
+            if ant.alive:
+                ant.draw(screen)
             # Update display
 
-        alice.draw(screen)
-        if any(alice.is_ant_inside(ant.x, ant.y) for ant in ants):
-            alice.find_target(ants)
-            alice.track_target()
-
-        else:
-            alice.target = None
-            alice.move_randomly()
+        alice.update(ants)
         alice.debug(screen)
+        alice.draw(screen)
 
         # Update display
         pygame.display.flip()

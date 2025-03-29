@@ -15,6 +15,19 @@ class Mob:
         self.target = None
         self.path = (random.uniform(self.center[0] - self.radius, self.center[0] + self.radius - 3),
                      random.uniform(self.center[1] - self.radius, self.center[1] + self.radius - 3))
+        self.next_hunt = 0
+
+    def update(self, ants):
+        if any(self.is_ant_inside(ant.x, ant.y) for ant in ants) and pygame.time.get_ticks() > self.next_hunt:
+
+            self.find_target(ants)
+            self.track_target()
+        else:
+            self.target = None
+            self.move_randomly()
+
+        if self.target:
+            self.check_collision_with_target()
 
     def move_randomly(self):
         if not self.target:
@@ -45,12 +58,24 @@ class Mob:
                 self.x += dx
                 self.y += dy
 
+    def check_collision_with_target(self):
+        print(self.target.id)
+        if self.target:
+            dx, dy = self.target.x - self.x, self.target.y - self.y
+            distance = math.sqrt(dx**2 + dy**2)
+            if distance < 5:  # Assuming 5 is the collision threshold
+                self.target.remove()
+                self.target = None
+                self.next_hunt = pygame.time.get_ticks() + 20000  # 20 seconds in milliseconds
+
     def is_ant_inside(self, ant_x, ant_y):
         distance = math.sqrt(
             (ant_x - self.center[0])**2 + (ant_y - self.center[1])**2)
         return distance <= self.radius
 
     def find_target(self, ants):
+        if pygame.time.get_ticks() < self.next_hunt:
+            return
         best_ant = None
         closest = float("inf")
         for ant in ants:
@@ -64,7 +89,7 @@ class Mob:
             self.target = None
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 0, 0), (int(
+        pygame.draw.circle(screen, (255, 255, 0), (int(
             self.x), int(self.y)), 5)
 
     def debug(self, screen):
